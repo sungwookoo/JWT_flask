@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>timeattack</title>
+    <style>
+
+        * {
+            box-sizing: border-box;
+            font-family: 'helvetica neue', 'Apple SD Gothic Neo', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #fafafa;
+            padding: 0;
+            margin: 0;
+        }
+
+        p, span {
+            font-size: 14px;
+        }
+
+        .container {
+            width: 360px;
+            height: 200px;
+            margin: 130px auto 10px;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            flex-wrap: wrap;
+            background-color: #fff;
+            border: 1px solid #DBDBDB;
+        }
+
+        .mini_container {
+            width: 360px;
+            height: 70px;
+            margin: 0px auto;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            flex-wrap: wrap;
+            background-color: #fff;
+            border: 1px solid #DBDBDB;
+        }
+
+        img.logo_instagram {
+            align-self: center;
+            width: 175px;
+            margin: 35px 0;
+        }
+
+        .input_login {
+            width: 270px;
+            height: 40px;
+            margin: 3px auto;
+            padding: 0 10px;
+            display: block;
+            background-color: #fafafa;
+            border: 1px solid #DBDBDB;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        .input_login::placeholder {
+            font-size: 12px;
+            color: #8e8e8e;
+        }
+
+        .input_login:focus {
+            border: 1px solid #8a8a8a;
+            outline: none;
+        }
+
+        #btn_login {
+            width: 268px;
+            height: 30px;
+            margin: 13px auto;
+            background-color: #0095f6;
+            border: none;
+            border-radius: 3px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        #btn_login:disabled {
+            background-color: #B9DFFC;
+        }
+
+        #btn_login:disabled:hover {
+            cursor: default;
+        }
+
+        #btn_login:enabled:hover {
+            cursor: pointer;
+        }
+
+        #btn_login:focus {
+            outline: none;
+        }
+
+        a {
+            cursor: default;
+        }
+
+        .button_forgot {
+            color: #00366B;
+            align-self: center;
+            font-size: 12px;
+            margin-top: 60px;
+        }
+
+        .sign_up {
+            color: #00366B;
+            align-self: center;
+            font-size: 14px;
+            margin-top: 25px;
+        }
+
+        .sign_up a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #0095f6;
+            cursor: pointer;
+        }
+
+        .button_forgot:hover {
+            cursor: pointer;
+        }
+
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <script>
+        $(function () {
+            $('.container').keyup(function (event) {
+                if (event.keyCode === 13) {
+                    if (checkNotEmpty()) {
+                        $('#btn_login').click();
+                    }
+                }
+            });
+        });
+
+
+        function login() {
+            $.ajax({
+                type: "POST",
+                url: "/api/login",
+                data: {email_give: $('#email').val(), pw_give: $('#password').val()},
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        alert('로그인성공')
+                        $.cookie('token', response['token'])
+                        window.location.href = '/';
+                    } else {
+                        alert(response['msg'])
+                    }
+                }
+            })
+        }
+
+        function checkNotEmpty() {
+            return $('#email').val().length > 0 && $('#password').val().length > 0;
+        }
+
+
+    </script>
+</head>
+<body>
+<div class="container">
+    <input type="text" class="input_login" name="email" id="email" style="margin-top: 30px" placeholder="이메일"
+           maxlength="30">
+    <input type="password" class="input_login" name="password" id="password" placeholder="비밀번호" maxlength="20">
+    <a>
+        <button onclick="login()" id="btn_login">로그인</button>
+    </a>
+</div>
+<div class="mini_container">
+    <span class="sign_up"><a href="/signup">회원가입</a></span>
+</div>
+
+</body>
+</html>
