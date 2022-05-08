@@ -135,6 +135,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
     <script>
+        let msg = '{{msg}}'
+        $(document).ready(function() {
+            if(msg.length > 0){
+                alert(msg)
+            }
+        })
+
         $(function () {
             $('.container').keyup(function (event) {
                 if (event.keyCode === 13) {
