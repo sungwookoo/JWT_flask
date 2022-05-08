@@ -13,54 +13,40 @@ db = client.dbtime
 SECRET_KEY = "TIMEATTACK"
 
 
-# 1. 로그인 / 회원가입에 사용
-# 2. 토큰이 유효하다면 로그인/회원가입의 접근을 차단하고 index.html로 해당 토큰 주인의 이메일 주소를 전달하며 이동
-# 3. 토큰이 유효한게 아니라면 {html}로 이동
-def check_token_auth(html):
+# 1. 토큰이 유효하다면 {html}로 user의 email을 전송하며 render_template
+# 2. 토큰이 유효하지 않다면 login.html로 이동
+def check_token(html):
     token_receive = request.cookies.get('token')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user = db.users.find_one({'_id': ObjectId(payload['id'])})
         if user is not None:
-            return render_template('index.html', email=user['email'])
-    finally:
-        return render_template(html)
+            if html == 'login.html':
+                return redirect(url_for('index', email=user['email']))
+            return render_template(html, email=user['email'])
 
-
-# 1. 토큰이 유효하다면 {target_html}에 해당 토큰 주인의 이메일 주소를 전달하며 이동
-# 2. 토큰 정보의 사용자가 존재하지 않는다면 로그인 화면으로 이동
-# 3. 토큰이 만료됐거나 유효하지 않다면 로그인 화면으로 redirect (except)
-def check_token_common(target_html):
-    token_receive = request.cookies.get('token')
-    try:
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user = db.users.find_one({'_id': ObjectId(payload['id'])})
-        if user is not None:
-            return render_template(target_html, email=user['email'])
-        else:
-            return render_template('login.html')
     except jwt.ExpiredSignatureError:
-        return redirect(url_for('login'))
+        return render_template('login.html', msg='로그인 만료')
     except jwt.exceptions.DecodeError:
-        return redirect(url_for('login'))
+        return render_template('login.html')
 
 
 # 메인
 @app.route('/')
 def index():
-    return check_token_common('index.html')
+    return check_token('index.html')
 
 
 # 로그인
 @app.route('/login')
 def login():
-    return check_token_auth('login.html')
+    return check_token('login.html')
 
 
 # 회원가입
 @app.route('/signup')
 def signup():
-    return check_token_auth('signup.html')
+    return check_token('signup.html')
 
 
 # 로그인 API
